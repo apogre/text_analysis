@@ -1,5 +1,5 @@
 from nltk.tag import StanfordNERTagger,StanfordPOSTagger
-# from nltk.parse.stanford import StanfordDependencyParser
+from nltk.parse.stanford import StanfordDependencyParser
 import os, sys
 from itertools import groupby
 from nltk import word_tokenize
@@ -10,13 +10,13 @@ import csv
 
 aux_verb = ['was', 'is', 'become', 'to', 'of', 'in', 'the', 'for', 'where', 'etc']
 
-# stanford_parser_jar = str(os.environ['HOME'])+'/stanford-parser-full-2015-12-09/stanford-parser.jar'
-# stanford_model_jar = str(os.environ['STANFORDTOOLSDIR'])+'/stanford-parser-full-2015-12-09/stanford-parser-3.6.0-models.jar'
+stanford_parser_jar = str(os.environ['HOME'])+'/stanford-parser-full-2015-12-09/stanford-parser.jar'
+stanford_model_jar = str(os.environ['STANFORDTOOLSDIR'])+'/stanford-parser-full-2015-12-09/stanford-parser-3.6.0-models.jar'
 
 # st_ner = StanfordNERTagger('english.muc.7class.distsim.crf.ser.gz')
 st_ner = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
-# st_pos = StanfordPOSTagger('english-bidirectional-distsim.tagger')
-# parser = StanfordDependencyParser(path_to_jar=stanford_parser_jar, path_to_models_jar=stanford_model_jar)
+st_pos = StanfordPOSTagger('english-bidirectional-distsim.tagger')
+parser = StanfordDependencyParser(path_to_jar=stanford_parser_jar, path_to_models_jar=stanford_model_jar)
 
 
 def triple_filter(ent, triples):
@@ -64,9 +64,9 @@ def triple_filter(ent, triples):
 
 def sentence_tagger(sentence_list):
     named_entities = st_ner.tag_sents(sentence_list)
-    # POS_tagger = st_pos.tag_sents(sentence_list)
-    # dependency_tagger = [[list(parse.triples()) for parse in dep_parse] for dep_parse in parser.parse_sents(sentence_list)]
-    return named_entities
+    POS_tagger = st_pos.tag_sents(sentence_list)
+    dependency_tagger = [[list(parse.triples()) for parse in dep_parse] for dep_parse in parser.parse_sents(sentence_list)]
+    return named_entities, POS_tagger, dependency_tagger
 
 
 def get_nodes(tagged_words):
@@ -110,9 +110,9 @@ if __name__ == "__main__":
     sentence_lis = [args.sentence]
     sentence_list = [word_tokenize(sent) for sent in sentence_lis]
     print sentence_list
-    sys.exit()
     named_tags = sentence_tagger(sentence_list)
-    # print named_tags
+    print named_tags
+    sys.exit()
     for ne in named_tags:
         sentence_check = sentence_lis[0]
         print sentence_check
